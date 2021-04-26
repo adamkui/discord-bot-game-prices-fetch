@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 let stores;
 
 client.once('ready', () => console.log('Ready!'));
-client.login('ODM0OTA3OTM1MDEyMTU5NTE5.YIHumw.QlawCNH2d-fya73_LfW61j__9Gk');
+client.login(process.env.token);
 
 client.on('message', message => {
 	if (!message.content.startsWith(prefix) || message.author.bot) return;
