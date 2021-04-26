@@ -4,6 +4,8 @@ const prefix = "!";
 const fetch = require('node-fetch');
 let stores;
 
+console.log('Hello world!');
+
 client.once('ready', () => console.log('Ready!'));
 client.login(process.env.token);
 
