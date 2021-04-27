@@ -18,10 +18,10 @@ client.on('message', message => {
     case "help":
       showHelp(message);
       break;
-    case "pricebyname"  || "pbn":
+    case ("pricebyname"  || "pbn"):
       checkPrice(args, message);
       break;
-    case "pricebyid" || "pbi":
+    case ("pricebyid" || "pbi"):
       checkPriceId(args, message);
       break;
     default:
