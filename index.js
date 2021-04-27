@@ -15,10 +15,13 @@ client.on('message', message => {
   const command = args.shift().toLowerCase(); 
 
   switch(command){
-    case "pricebyname":
+    case "help":
+      showHelp(message);
+      break;
+    case "pricebyname"  || "pbn":
       checkPrice(args, message);
       break;
-    case "pricebyid":
+    case "pricebyid" || "pbi":
       checkPriceId(args, message);
       break;
     default:
@@ -29,6 +32,20 @@ client.on('message', message => {
 
 
 //************ Functions ************
+
+const showHelp = function (message) {
+  message.channel.send({embed: {
+    color: 3447003,
+    author: {
+      name: client.user.username,
+      icon_url: client.user.avatarURL
+    },
+    title: `PriceCheckBot parancsok`,
+    fields: [{name: "!help", value: "Segítség"}, {name: "!pricebyname or !pbn", value: "Játék / játék csomagok keresése név alapján. Eredménye: Játéknév + egyedi azonosító"}, {name: "!pricebyid or !pbi", value: "Játék árának lekérdezése, a játék egyedi ID-ja alapján."}],
+    timestamp: new Date(),
+    }
+  });
+}
 
 const getStores = async function() {
   const baseUrl = "https://www.cheapshark.com/api/1.0/stores";
