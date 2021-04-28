@@ -58,7 +58,8 @@ const getStores = async function() {
 
 const checkPrice = async function (args, message){
   const baseUrl = "https://www.cheapshark.com/api/1.0/games?title=";
-  const games = await fetch(`${baseUrl}${args}`)
+  try {
+    const games = await fetch(`${baseUrl}${args}`)
     .then(res => res.json())
     .then(res => res.map(game => `${game.external} (id: ${game.gameID})`))
     .then(res => {
@@ -66,15 +67,17 @@ const checkPrice = async function (args, message){
         ? `Szia ${message.author}, az alábbi játékokat találtam. Használd a '!pricebyid' parancsot, és írd mögé a játék ID-ját a konkrét ajánlatokért. \n\n${res.join("\n")}` 
         : `Szia ${message.author}, sajnos nem találtom játékokat ezzel a névvel.`;
       message.channel.send(msg);
-    }
-      
-    )
+    })
+  } catch (err){
+    message.channel.send(`Szia ${message.author}, hiba lépett fel a keresés közben. Próbáld szűkíteni a találatokat egy pontosabb játéknév megadásával`)
+  }
 }
 
 const checkPriceId = async function (args, message){
   await getStores();
   const baseUrl = "https://www.cheapshark.com/api/1.0/games?id=";
-  const deal = await fetch(`${baseUrl}${args}`)
+  try {
+    const deal = await fetch(`${baseUrl}${args}`)
     .then(res => res.json())
     .then(res => {
       let title = res.info.title;
@@ -102,5 +105,8 @@ const checkPriceId = async function (args, message){
         message.channel.send(`Szia ${message.author}, nem találtam ajánlatot találtam ezzel az ID-val.`);
       }
     })
+  } catch (err){
+    message.channel.send(`Szia ${message.author}, nem találtam ajánlatot találtam ezzel az ID-val.`);
+  }
 }
 
