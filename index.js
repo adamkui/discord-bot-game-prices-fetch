@@ -4,8 +4,6 @@ const prefix = "!";
 const fetch = require('node-fetch');
 let stores;
 
-console.log('Hello world!');
-
 client.once('ready', () => console.log('Ready!'));
 client.login(process.env.token);
 
@@ -63,7 +61,14 @@ const checkPrice = async function (args, message){
   const games = await fetch(`${baseUrl}${args}`)
     .then(res => res.json())
     .then(res => res.map(game => `${game.external} (id: ${game.gameID})`))
-    .then(res => message.channel.send(`Szia ${message.author}, az alábbi játékokat találtam. Használd a '!pricebyid' parancsot, és írd mögé a játék ID-ját a konkrét ajánlatokért. \n\n${res.join("\n")}`))
+    .then(res => {
+      let msg = res.length 
+        ? `Szia ${message.author}, az alábbi játékokat találtam. Használd a '!pricebyid' parancsot, és írd mögé a játék ID-ját a konkrét ajánlatokért. \n\n${res.join("\n")}` 
+        : `Szia ${message.author}, sajnos nem találtom játékokat ezzel a névvel.`;
+      message.channel.send(msg);
+    }
+      
+    )
 }
 
 const checkPriceId = async function (args, message){
@@ -77,24 +82,25 @@ const checkPriceId = async function (args, message){
       let cheapestStoreId = res.deals.map(deal => deal.storeID)[0];
       let cheapestStoreName = stores.filter(store => store.storeID == cheapestStoreId)[0].storeName;
       let dealID = res.deals.map(deal => deal.dealID)[0];
-      let saving = res.deals.map(deal => parseFloat(deal.savings).toFixed(2))[0];
-      let summary = res.deals.map(deal => `${stores.filter(s => s.storeID == deal.storeID)[0].storeName}: ${parseFloat(deal.price)} -- [Link](http://www.cheapshark.com/redirect?dealID=${deal.dealID})`);
+      let countOfDeals = res.deals.length;
 
       //Send replies
-      message.channel.send(`Szia ${message.author}, ${res.deals.length} ajánlatot találtam erre a játékra: ${title}. A legalacsonyabb ár ${cheapestPrice}(USD/EUR) a következőn: ${cheapestStoreName}. A részleteket lent találod:`);
-      message.channel.send({embed: {
-        color: 3447003,
-        author: {
-          name: client.user.username,
-          icon_url: client.user.avatarURL
-        },
-        title: `Ajánlatok erre: ${title}`,
-        fields: res.deals.map(deal => ({name: stores.filter(s => s.storeID == deal.storeID)[0].storeName, value: `Ár: ${parseFloat(deal.price)}(USD/EUR) --- [Link](http://www.cheapshark.com/redirect?dealID=${deal.dealID})`})),
-        timestamp: new Date(),
+      if (countOfDeals) {
+        message.channel.send(`Szia ${message.author}, ${countOfDeals} ajánlatot találtam erre a játékra: ${title}. A legalacsonyabb ár ${cheapestPrice}(USD/EUR) a következőn: ${cheapestStoreName}. A részleteket lent találod:`);
+        message.channel.send({embed: {
+          color: 3447003,
+          author: {
+            name: client.user.username,
+            icon_url: client.user.avatarURL
+          },
+          title: `Ajánlatok erre: ${title}`,
+          fields: res.deals.map(deal => ({name: stores.filter(s => s.storeID == deal.storeID)[0].storeName, value: `Ár: ${parseFloat(deal.price)}(USD/EUR) --- [Link](http://www.cheapshark.com/redirect?dealID=${deal.dealID})`})),
+          timestamp: new Date(),
+        }});
+        message.channel.send(`\nLink a legjobb ajánlathoz innen: ${cheapestStoreName} \nhttps://www.cheapshark.com/redirect?dealID=${dealID}`);
+      } else {
+        message.channel.send(`Szia ${message.author}, nem találtam ajánlatot találtam ezzel az ID-val.`);
       }
-    });
-    message.channel.send(`\nLink a legjobb ajánlathoz innen: ${cheapestStoreName} \nhttps://www.cheapshark.com/redirect?dealID=${dealID}`);
-
     })
 }
 
